@@ -39,6 +39,9 @@ function renderList(group, names, hasDrawn = false) {
     empty.querySelector('p').textContent = hasDrawn ? '예비 인원을 설정하지 않았어요.' : '다음 기회를 기다리는 명단';
     empty.querySelector('span:last-child').textContent = hasDrawn ? '선발 명단을 확인해 주세요.' : '선발 명단과 겹치지 않아요.';
   }
+  if (group === 'unselected') {
+    document.getElementById('unselected-card').hidden = !hasDrawn;
+  }
   document.getElementById(`${group}-total`).textContent = `${names.length}명`;
   const downloadButton = document.getElementById(`${group}-download`);
   downloadButton.disabled = names.length === 0 || downloadButton.dataset.downloading === 'true';
@@ -47,6 +50,7 @@ function renderList(group, names, hasDrawn = false) {
 function clearResults() {
   renderList('selected', []);
   renderList('reserve', []);
+  renderList('unselected', []);
   resultStatus.textContent = '추첨 대기 중';
   resultStatus.classList.remove('is-complete');
   message.textContent = '';
@@ -127,7 +131,7 @@ function createResultImage(title, names, group) {
   context.textBaseline = 'top';
   context.fillStyle = '#ffffff';
   context.fillRect(0, 0, 800, height);
-  const accent = group === 'selected' ? '#16705b' : '#977441';
+  const accent = group === 'selected' ? '#16705b' : group === 'reserve' ? '#977441' : '#657585';
   context.fillStyle = accent;
   context.fillRect(0, 0, 800, 8);
   context.font = `700 16px ${font}`;
@@ -139,7 +143,7 @@ function createResultImage(title, names, group) {
   context.fillText(`총 ${names.length}명 · 이름순 정렬`, 48, 134);
   let y = 180;
   rows.forEach((row, index) => {
-    context.fillStyle = group === 'selected' ? '#f2f7f0' : '#faf6ee';
+    context.fillStyle = group === 'selected' ? '#f2f7f0' : group === 'reserve' ? '#faf6ee' : '#f0f3f6';
     context.fillRect(48, y, 704, row.height - 8);
     context.fillStyle = accent;
     context.font = `18px ${font}`;
@@ -163,7 +167,7 @@ async function downloadResult(group) {
   status.textContent = '';
   try {
     await document.fonts.ready;
-    const title = group === 'selected' ? '선발 명단' : '예비 명단';
+    const title = document.getElementById(`${group}-title`).textContent;
     const canvas = createResultImage(title, names, group);
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     if (!blob) throw new Error('Image export failed');
@@ -184,7 +188,7 @@ async function downloadResult(group) {
   }
 }
 
-for (const group of ['selected', 'reserve']) {
+for (const group of ['selected', 'reserve', 'unselected']) {
   document.getElementById(`${group}-download`).addEventListener('click', () => downloadResult(group));
 }
 
@@ -226,7 +230,8 @@ form.addEventListener('submit', event => {
   }
   renderList('selected', names.slice(0, selected).sort(compareNames), true);
   renderList('reserve', names.slice(selected, required).sort(compareNames), true);
-  resultStatus.textContent = `선발 ${selected}명 · 예비 ${reserve}명 완료`;
+  renderList('unselected', names.slice(required).sort(compareNames), true);
+  resultStatus.textContent = `선발 ${selected}명 · 예비 ${reserve}명 · 미선발 ${names.length - required}명 완료`;
   resultStatus.classList.add('is-complete');
   saveState();
 });

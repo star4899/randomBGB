@@ -61,7 +61,7 @@ textarea:focus { border-color: var(--green); background: white; }
 .button-arrow { margin-left: auto; }
 .draw-button > .icon:first-child { margin-right: auto; }
 .storage-note { margin: 12px 0 0; color: var(--muted); font-size: 10px; text-align: center; line-height: 1.7; }
-.results-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 63px; margin-bottom: 19px; }
+.results-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; min-height: 63px; margin-bottom: 19px; }
 .results-heading .eyebrow { margin-bottom: 8px; font-size: 9px; letter-spacing: 1.7px; }
 .results-heading h2 { font-size: 23px; letter-spacing: -.8px; }
 .result-status { padding: 7px 11px; border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-size: 11px; white-space: nowrap; }
@@ -70,6 +70,13 @@ textarea:focus { border-color: var(--green); background: white; }
 .result-card { min-width: 0; min-height: 433px; padding: 20px 18px; }
 .selected-card { border-top: 3px solid #5b9a7b; }
 .reserve-card { border-top: 3px solid #c6a26a; }
+.unselected-card { grid-column: 1 / -1; min-height: 0; border-top: 3px solid #99a6af; }
+.unselected-card .empty-state { min-height: 145px; }
+.unselected-card .name-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.unselected-card .result-icon { color: #657585; background: #f0f3f6; }
+.unselected-card .result-total { color: #657585; }
+.unselected-card .name-list li { background: #f7f9fb; border-color: #e5ebef; }
+.unselected-card .person-number { color: #7c8b99; }
 .result-card-heading { display: flex; align-items: center; gap: 8px; }
 .result-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: #eef6ef; color: var(--green); }
 .result-icon .icon { width: 18px; height: 18px; }
@@ -96,6 +103,8 @@ h3 { margin: 0; font-size: 14px; letter-spacing: -.5px; }
 .download-button:hover:not(:disabled) { background: #f0f6ef; }
 .reserve-card .download-button { border-color: #e8e0d1; color: #977441; }
 .reserve-card .download-button:hover:not(:disabled) { background: #faf6ee; }
+.unselected-card .download-button { border-color: #e0e6eb; color: #657585; }
+.unselected-card .download-button:hover:not(:disabled) { background: #f0f3f6; }
 .download-button:disabled { opacity: .45; cursor: not-allowed; }
 .download-status { margin: 12px 0 0; color: #ad4036; font-size: 12px; line-height: 1.6; }
 .download-status:empty { display: none; }
@@ -113,6 +122,7 @@ h3 { margin: 0; font-size: 14px; letter-spacing: -.5px; }
   .result-card { min-height: 0; }
   .empty-state { min-height: 145px; }
   .reserve-card .name-list { grid-template-columns: 1fr 1fr; }
+  .unselected-card .name-list { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 720px) {

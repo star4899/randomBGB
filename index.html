@@ -83,6 +83,14 @@
               <ol id="reserve-list" class="name-list" aria-label="예비 참여자" hidden></ol>
               <button id="reserve-download" class="download-button" type="button" aria-label="예비 명단 이미지 다운로드" disabled><svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg> 이미지 다운로드</button>
             </section>
+
+            <section id="unselected-card" class="panel result-card unselected-card" aria-labelledby="unselected-title" hidden>
+              <div class="result-card-heading"><span class="result-icon"><svg class="icon" aria-hidden="true"><use href="#icon-users"/></svg></span><h3 id="unselected-title">미선발 명단</h3><span id="unselected-total" class="result-total">0명</span></div>
+              <p class="result-description">선발·예비에 포함되지 않은 참여자 · 이름순 정렬</p>
+              <div id="unselected-empty" class="empty-state"><span class="empty-icon"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span><p>미선발 인원이 없습니다.</p><span>모든 참여자가 선발·예비 명단에 포함되었어요.</span></div>
+              <ol id="unselected-list" class="name-list" aria-label="미선발 참여자" hidden></ol>
+              <button id="unselected-download" class="download-button" type="button" aria-label="미선발 명단 이미지 다운로드" disabled><svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg> 이미지 다운로드</button>
+            </section>
           </div>
           <p id="download-status" class="download-status" role="status"></p>
           <p class="results-note"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> 모든 참여자에게 같은 기회, 선발과 예비는 중복 없이.</p>
