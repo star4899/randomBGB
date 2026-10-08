@@ -103,6 +103,7 @@ h3 { margin: 0; font-size: 14px; letter-spacing: -.5px; }
 .results-note .icon { width: 15px; height: 15px; color: #67947b; }
 .site-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 48px; padding: 22px 0 30px; border-top: 1px solid var(--border); color: #7c8b81; font-size: 10px; line-height: 1.8; }
 .footer-divider { margin: 0 8px; color: #bdc8bd; }
+.creator-credit { display: inline-block; margin-top: 5px; color: var(--green); font-weight: 600; }
 .noscript-notice { padding: 16px; background: #fff0ed; color: #ad4036; border-radius: 10px; }
 
 @media (max-width: 1050px) {

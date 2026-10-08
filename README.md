@@ -43,5 +43,5 @@ Random BGB는 Dark War:Survival의 BGB 참여자를 무작위로 선발하는 �
 
 <p align="center">
   <sub>Created by</sub><br>
-  <strong>⭐ #377 CHB · 별 star</strong>
+  <strong>⭐ #377 CHB · 별star</strong>
 </p>
