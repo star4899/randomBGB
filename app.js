@@ -9,11 +9,20 @@ const resultStatus = document.getElementById('result-status');
 const storageStatus = document.getElementById('storage-status');
 const storageKey = 'random-bgb-state';
 const compareNames = new Intl.Collator('ko', { sensitivity: 'base', numeric: true }).compare;
+const drawCounts = Object.create(null);
 
 function readRoster() {
   const entries = roster.value.split(/\r?\n/).map(name => name.trim()).filter(Boolean);
   const names = [...new Set(entries)];
   return { names, duplicateCount: entries.length - names.length };
+}
+
+function getRosterKey() {
+  return JSON.stringify(readRoster().names.sort());
+}
+
+function updateDrawCount() {
+  document.getElementById('draw-count').textContent = `같은 명단으로 총 ${drawCounts[getRosterKey()] || 0}회 추첨`;
 }
 
 function renderList(group, names, hasDrawn = false) {
@@ -63,6 +72,7 @@ function updateRosterSummary() {
   document.getElementById('roster-summary').textContent = duplicateCount
     ? `총 ${names.length}명 · 중복 ${duplicateCount}건을 제외한 추첨 인원입니다.`
     : `총 ${names.length}명 · 빈 줄과 중복된 이름은 자동으로 제외합니다.`;
+  updateDrawCount();
 }
 
 function saveState() {
@@ -70,9 +80,10 @@ function saveState() {
     sessionStorage.setItem(storageKey, JSON.stringify({
       roster: roster.value,
       selectedCount: selectedCount.value,
-      reserveCount: reserveCount.value
+      reserveCount: reserveCount.value,
+      drawCounts
     }));
-    storageStatus.textContent = '명단과 설정이 이 탭에 임시 저장되었습니다.';
+    storageStatus.textContent = '명단·설정·추첨 횟수가 이 탭에 임시 저장되었습니다.';
   } catch {
     storageStatus.textContent = '임시 저장이 불가능합니다. 새로고침하면 입력 내용이 사라집니다.';
   }
@@ -89,7 +100,12 @@ function restoreState() {
         input.value = String(count);
       }
     }
-    storageStatus.textContent = '이전에 입력한 명단과 설정을 불러왔습니다.';
+    if (saved.drawCounts && typeof saved.drawCounts === 'object' && !Array.isArray(saved.drawCounts)) {
+      for (const [key, count] of Object.entries(saved.drawCounts)) {
+        if (Number.isSafeInteger(count) && count >= 0) drawCounts[key] = count;
+      }
+    }
+    storageStatus.textContent = '이전에 입력한 명단·설정·추첨 횟수를 불러왔습니다.';
   } catch {
     storageStatus.textContent = '임시 저장 내용을 불러올 수 없습니다. 명단을 다시 입력해 주세요.';
   }
@@ -105,7 +121,7 @@ function randomIndex(range) {
   return buffer[0] % range;
 }
 
-function createResultImage(title, names, group) {
+function createResultImage(title, names, group, drawCount) {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
   if (!context) throw new Error('Canvas unavailable');
@@ -140,7 +156,7 @@ function createResultImage(title, names, group) {
   context.fillText(title, 48, 78);
   context.fillStyle = '#6d7c74';
   context.font = `18px ${font}`;
-  context.fillText(`총 ${names.length}명 · 이름순 정렬`, 48, 134);
+  context.fillText(`총 ${names.length}명 · 이름순 정렬 · 동일 명단 ${drawCount}회 추첨`, 48, 134);
   let y = 180;
   rows.forEach((row, index) => {
     context.fillStyle = group === 'selected' ? '#f2f7f0' : group === 'reserve' ? '#faf6ee' : '#f0f3f6';
@@ -159,6 +175,7 @@ function createResultImage(title, names, group) {
 async function downloadResult(group) {
   const names = [...document.querySelectorAll(`#${group}-list .person-name`)].map(item => item.textContent);
   if (!names.length) return;
+  const drawCount = drawCounts[getRosterKey()] || 0;
   const button = document.getElementById(`${group}-download`);
   if (button.dataset.downloading === 'true') return;
   const status = document.getElementById('download-status');
@@ -168,7 +185,7 @@ async function downloadResult(group) {
   try {
     await document.fonts.ready;
     const title = document.getElementById(`${group}-title`).textContent;
-    const canvas = createResultImage(title, names, group);
+    const canvas = createResultImage(title, names, group, drawCount);
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     if (!blob) throw new Error('Image export failed');
     const url = URL.createObjectURL(blob);
@@ -231,6 +248,9 @@ form.addEventListener('submit', event => {
   renderList('selected', names.slice(0, selected).sort(compareNames), true);
   renderList('reserve', names.slice(selected, required).sort(compareNames), true);
   renderList('unselected', names.slice(required).sort(compareNames), true);
+  const rosterKey = getRosterKey();
+  drawCounts[rosterKey] = Math.min((drawCounts[rosterKey] || 0) + 1, Number.MAX_SAFE_INTEGER);
+  updateDrawCount();
   resultStatus.textContent = `선발 ${selected}명 · 예비 ${reserve}명 · 미선발 ${names.length - required}명 완료`;
   resultStatus.classList.add('is-complete');
   saveState();
